@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Paranoid</title>
+    </head>
+    <body>
+
+        <dialog id="dialog" class="mdl-dialog">
+            <div class="mdl-dialog__title"><i class="fa fa-exclamation-triangle"></i>&nbsp;Warning</div>
+            <div class="mdl-dialog__content">
+                <p id="dialog-intern-message"></p>
+            </div>
+            <div class="mdl-dialog__actions">
+                <button type="button" class="mdl-button agree">Agree</button>
+                <button type="button" class="mdl-button close">Disagree</button>
+            </div>
+        </dialog>
+
+        <div class="mdl-layout mdl-js-layout has-drawer is-upgraded">
+            <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+                <header class="mdl-layout__header">
+                    <div class="mdl-layout__header-row">
+                        <span class="mdl-layout-title"><h3>Paranoid</h3></span>
+                        <div class="mdl-layout-spacer"></div>
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right">
+                            <button id="btn-exit" class="mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" for="fixed-header-drawer-exp">
+                                <i class="material-icons">input</i>
+                            </button>
+                            <div class="mdl-textfield__expandable-holder">
+                                <input class="mdl-textfield__input" type="text" name="sample" id="fixed-header-drawer-exp">
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="mdl-layout__drawer">
+                    <span class="mdl-layout-title">Groups</span>
+                    <hr />
+                    <nav class="mdl-navigation">
+                        <a class="mdl-navigation__link" href="">
+                            <i class="material-icons">account_circle</i>&nbsp;&nbsp;<span class="mdl-badge" data-badge="4">FunPeople</span>
+                        </a>
+                        <a class="mdl-navigation__link" href="">
+                            <i class="material-icons">account_circle</i>&nbsp;&nbsp;<span class="mdl-badge" data-badge="10">Family</span>
+                        </a>
+                    </nav>
+                </div>
+
+                <main class="mdl-layout__content" style="margin-left: 0px;">
+                    <div class="mdl-grid" style="padding: 0px;">
+                        <div style="width: 100%;">
+                            <div class="chat-talk">
+                                <div class="chat-talk-intern"></div>
+                            </div>
+                            <div class="chat-command-box">
+                                <div class="emojione" style="width: 100%; height: auto;">
+                                    <div style="padding: 0px 15px;">
+                                        <ul class="emoji-picker">
+                                            <li><a data-category="people" title="Smileys &amp; People"><i class="fa fa-smile-o"></i></a></li>
+                                            <li><a class="" data-category="nature" title="Animals &amp; Nature"><i class="fa fa-tree"></i></a></li>
+                                            <li><a data-category="food" title="Food &amp; Drink"><i class="fa fa-coffee"></i></a></li>
+                                            <li><a data-category="activity" title="Activity"><i class="fa fa-bolt"></i></a></li>
+                                            <li><a data-category="travel" title="Travel &amp; Places"><i class="fa fa-car"></i></a></li>
+                                            <li><a data-category="objects" title="Objects"><i class="fa fa-lightbulb-o"></i></a></li>
+                                            <li><a data-category="symbols" title="Symbols"><i class="fa fa-hashtag"></i></a></li>
+                                            <li><a data-category="flags" title="Flags"><i class="fa fa-flag"></i></a></li>
+                                            <li><a data-category="diversity" title="Diversity"><i class="fa fa-group"></i></a></li>
+                                        </ul>
+
+                                        <div>
+                                            <ul class="emoji-gallery" id="emoji-people"></ul>
+                                            <ul class="emoji-gallery" id="emoji-nature"></ul>
+                                            <ul class="emoji-gallery" id="emoji-food"></ul>
+                                            <ul class="emoji-gallery" id="emoji-activity"></ul>
+                                            <ul class="emoji-gallery" id="emoji-travel"></ul>
+                                            <ul class="emoji-gallery" id="emoji-objects"></ul>
+                                            <ul class="emoji-gallery" id="emoji-symbols"></ul>
+                                            <ul class="emoji-gallery" id="emoji-flags"></ul>
+                                            <ul class="emoji-gallery" id="emoji-diversity"></ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mdl-grid" class="chat-command-box-intern">
+                                    <div class="mdl-cell mdl-cell--10-col mdl-cell--6-col-tablet mdl-cell--2-col-phone">
+                                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                            <textarea class="mdl-textfield__input" type="text" rows="3" id="message" ></textarea>
+                                            <label class="mdl-textfield__label" for="login">Message:</label>
+                                        </div>
+                                    </div>
+                                    <div class="mdl-cell mdl-cell--2-col mdl-cell--2-col-tablet mdl-cell--2-col-phone" style="text-align: center;">
+                                        <button id="btn-send-message" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" style="margin-top: 15px;">Send</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+            </div>
+        </div>
+
+        <link rel="stylesheet" href="../public/css/main.css" />
+        <link rel="stylesheet" href="../public/css/material.teal-red.min.css" />
+        <link rel="stylesheet" href="../public/css/font-awesome.min.css">
+        <link rel="stylesheet" href="../public/css/emojione.min.css">
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+        <script>window.$ = window.jQuery = require('../public/js/libs/jquery.min.js');</script>
+        <script src="../public/js/libs/utils.js"></script>
+        <script src="../public/js/libs/sjcl.js"></script>
+        <script src="../public/js/libs/material.min.js"></script>
+        <script src="../public/js/libs/emojione.min.js"></script>
+        <script src="../public/js/views/chat.js"></script>
+    </body>
+</html>

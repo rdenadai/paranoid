@@ -1,0 +1,219 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('server:server');
+var http = require('http');
+const sjcl = require('../utils/sjcl.js');
+const _ = require('lodash');
+const hash_key = require('../enc.js');
+
+// IMPORTANT USAGE OF PUBLIC / SECRET KEY IN SJCL
+// https://github.com/bitwiseshiftleft/sjcl/issues/134#issuecomment-29355149
+console.log('Generating keys... wait...');
+var keys = sjcl.ecc.elGamal.generateKeys(384, 1);
+var pubkem = keys.pub.kem(); //KEM is Key Encapsulation Mechanism
+const pubkey = pubkem.key;
+const seckey = keys.sec.unkem(pubkem.tag); //tag is used to derive the secret (private) key
+console.log('keys created!');
+
+/**
+ * Database dependencies.
+ */
+console.log('Loading models...');
+var User = require('../models');
+console.log('Models loaded!');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '8080');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+console.log('Socket.io starting...');
+var io = require('socket.io')(server);
+console.log('Socket.io finished...');
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+console.log('Starting server...');
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+console.log('Server up!');
+
+var listUsuarios = [];
+var socketsIDs = [];
+io.on('connection', function (socket) {
+  console.log('Connection started...');
+
+  socket.on('disconnect', function() {
+    console.log('disconnected...');
+
+    var removeSocketUsuario = [];
+    _.each(socketsIDs, function(socketUsuario, pos) {
+      if(socketUsuario.username == socket.user_username) {
+        removeSocketUsuario.push(pos);
+        delete io.sockets.sockets[socketUsuario.id];
+      }
+    });
+
+    _.each(removeSocketUsuario, function(pos) {
+      delete socketsIDs[pos];
+    });
+  });
+
+  socket.on('get-pub-key', function() {
+    console.log('retriving the public key to client...');
+    socket.emit('receive-pub-key', pubkey);
+  });
+
+  socket.on('user-pub-key', function(pubkey_user) {
+    // Lets see if the user already is connected and get its pbkey!
+    var exists = _.findIndex(socketsIDs, function(o) { return o.id == socket.id; });
+    if(exists < 0) {
+      socketsIDs.push({ id: socket.id, username: socket.user_username, name: socket.user_name, key: pubkey_user });
+    }
+  });
+
+  socket.on('authorized', function() {
+    socket.emit('is-authorized', socket.auth + '');
+  });
+
+  socket.on('get-logged-users', function (message) {
+    if(socket.auth) {
+      var encryptedUsuarios = [];
+      _.each(socketsIDs, function(socketUsuario, key) {
+        var encryptedName = sjcl.encrypt(socketUsuario.key, socket.user_name).toString();
+        encryptedUsuarios.push(encryptedName);
+      });
+      socket.emit('receive-logged-user', { usuarios: encryptedUsuarios });
+    }
+  })
+
+  socket.on('send-message', function(message) {
+    if(socket.auth) {
+      var data = new Date();
+      var minutes = data.getMinutes();
+      data = data.getHours() + ':' + ((minutes.toString().length > 1) ? minutes : '0' + minutes);
+
+      var mensagem = message.message;
+      var decryptedMessage = '';
+      try {
+        decryptedMessage = sjcl.decrypt(seckey, mensagem);
+      } catch(exception) {}
+
+      var removeSocketUsuario = [];
+      _.each(socketsIDs, function(socketUsuario, key) {
+        try{
+          var encryptedData = sjcl.encrypt(socketUsuario.key, data).toString();
+          var encryptedName = sjcl.encrypt(socketUsuario.key, socket.user_name).toString();
+          var encryptedMessage = sjcl.encrypt(socketUsuario.key, decryptedMessage).toString();
+          io.sockets.sockets[socketUsuario.id].emit('receive-message', { hora: encryptedData, name: encryptedName, message: encryptedMessage });
+        } catch(exception) {
+          console.log('erro: ' + exception);
+          removeSocketUsuario.push(key);
+        }
+      });
+      _.each(removeSocketUsuario, function(rem) {
+        delete socketsIDs[rem];
+      });
+    }
+  });
+});
+
+console.log('Socket.io-auth starting...');
+require('socketio-auth')(io, {
+  timeout: 'none',
+  authenticate: function (socket, data, callback) {
+    // get credentials sent by the client
+    var username = sjcl.decrypt(seckey, data.username);
+    var password = sjcl.decrypt(seckey, data.password);
+    password = sjcl.hash.sha256.hash(password).toString();
+    User.findOne({
+      where: {username: username, passwd: password},
+      attributes: ['uid', 'passwd', 'name', 'email']
+    }).then(function(user) {
+      if (!user) return callback(new Error("User not found"));
+      var login_ok = (user.passwd == password);
+      if (login_ok) {
+        socket.user_username = user.username;
+        socket.user_name = user.name;
+      }
+      return callback(null, login_ok);
+    });
+  }
+});
+console.log('Socket.io-auth finished...');
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}

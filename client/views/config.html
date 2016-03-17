@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Paranoid</title>
+    </head>
+    <body>
+
+        <dialog class="mdl-dialog">
+            <div class="mdl-dialog__title"><i class="fa fa-save"></i>&nbsp;Save?</div>
+            <div class="mdl-dialog__content">
+                <p>Are you sure that this is the correct server name or ip address?<br />You can change that later if its not.</p>
+            </div>
+            <div class="mdl-dialog__actions">
+                <button type="button" class="mdl-button agree">Agree</button>
+                <button type="button" class="mdl-button close">Disagree</button>
+            </div>
+        </dialog>
+
+        <div class="mdl-layout mdl-js-layout has-drawer is-upgraded">
+            <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+                <main class="mdl-layout__content" style="margin-left: 0px;">
+                    <div class="mdl-grid">
+                        <div class="mdl-cell mdl-cell--12-col-desktop">
+                            <div style="width: 100%;" class="form-card mdl-card mdl-shadow--2dp">
+                                <div class="mdl-card__title mdl-card--expand">
+                                    <h3 class="title"><i class="material-icons">settings</i>&nbsp;Configurations</h3>
+                                </div>
+                                <div class="mdl-card__supporting-text">
+                                    <p>Please configure connection to the Web Chat server provider.<br /> Type the name of the server or its ip address.</p>
+                                </div>
+                                <div id="conf">
+                                    <div class="mdl-card__supporting-text">
+                                        <form action="#" method="POST">
+                                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width: 100%;">
+                                                <input class="mdl-textfield__input" type="text" id="server_uri" name="server_uri">
+                                                <label class="mdl-textfield__label" for="server_uri">Server:</label>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="mdl-card__actions mdl-card--border">
+                                        <button id="btn-save-serve" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Save</button>
+                                        <button id="btn-back" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Back</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <link rel="stylesheet" href="../public/css/main.css" />
+        <link rel="stylesheet" href="../public/css/material.teal-red.min.css" />
+        <link rel="stylesheet" href="../public/css/font-awesome.min.css">
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+        <script>window.$ = window.jQuery = require('../public/js/libs/jquery.min.js');</script>
+        <script src="../public/js/libs/material.min.js"></script>
+        <script src="../public/js/libs/utils.js"></script>
+        <script src="../public/js/libs/sjcl.js"></script>
+        <script src="../public/js/views/config.js"></script>
+    </body>
+</html>

@@ -1,0 +1,14 @@
+{
+    "name"    : "your-app",
+    "version" : "0.0.0",
+    "main"    : "public/js/main.js",
+    "scripts": {
+        "start": "electron .",
+        "postinstall": "npm install sqlite3 --build-from-source --runtime=node-webkit --target_arch=ia64 --target=0.12.3 --no-bin-links && npm install electron-rebuild --no-bin-links"
+    },
+    "dependencies": {
+        "socket.io": "~1.4.5",
+        "moment": "~2.11.2",
+        "sequelize": "3.19.3"
+    }
+}
