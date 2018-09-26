@@ -1,14 +1,20 @@
 {
-    "name"    : "your-app",
-    "version" : "0.0.0",
-    "main"    : "public/js/main.js",
+    "name": "your-app",
+    "version": "0.0.0",
+    "main": "public/js/main.js",
     "scripts": {
         "start": "electron .",
-        "postinstall": "npm install sqlite3 --build-from-source --runtime=node-webkit --target_arch=ia64 --target=0.12.3 --no-bin-links && npm install electron-rebuild --no-bin-links"
+        "postinstall": "npm install sqlite3 --build-from-source --runtime=node-webkit --target_arch=ia64 --target=0.33.4 --no-bin-links && npm install electron-rebuild -w sqlite3 --no-bin-links"
     },
     "dependencies": {
-        "socket.io": "~1.4.5",
+        "electron-rebuild": "^1.8.2",
         "moment": "~2.22.2",
-        "sequelize": "3.19.3"
+        "node-gyp": "^3.8.0",
+        "node-pre-gyp": "^0.11.0",
+        "nw-gyp": "^3.6.3",
+        "sequelize": "^4.39.0",
+        "socket.io": "^2.1.1",
+        "socket.io-client": "^2.1.1",
+        "sqlite3": "^4.0.2"
     }
 }
